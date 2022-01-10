@@ -10,6 +10,13 @@ def fileRead(filename):
     with open(filename,'rb') as file:
          data=pickle.load(file)
          return data
+def logout():
+    clear()
+    print("Logging out");time.sleep(0.5);clear()
+    print("Logging out.");time.sleep(0.5);clear()
+    print("Logging out..");time.sleep(0.5);clear()
+    print("Logging out...");time.sleep(0.5);clear()
+    login()
 def register(): #Adds new user account  
     usn=input("Enter a username:\n")
     usn=usn.strip()
@@ -213,17 +220,24 @@ def admin():
             admin()
         fileWrite("UserAcc",accounts)
     elif mastchoice1=='4':
-        clear()
-        print("Logging out");time.sleep(0.5);clear()
-        print("Logging out.");time.sleep(0.5);clear()
-        print("Logging out..");time.sleep(0.5);clear()
-        print("Logging out...");time.sleep(0.5);clear()
-        login()
+        logout()
     else:
         print("Invalid Input! Reinitializing page...")
         time.sleep(3)
         admin()
+def games():
+    print("Which game would you like to play?\n")
+    gchoice=input("1)Snake!\n2)Sudoku(Coming Soon...)\n3)#Tic-Tac-Toe#(Coming Soon...)\n4)Back\n")
+    if gchoice =='1':
+        exec(open("snake.py").read())
+    elif gchoice =='2':
+        exec(open("").read())
+    elif gchoice =='3':
+        exec(open("").read())
+    elif gchoice=='4':
+        home()
 def login(): #Checks and logs in user
+    clear()
     n=5
     accounts=fileRead("UserAcc")
     bool=True
@@ -262,7 +276,7 @@ def login(): #Checks and logs in user
                 print("Welcome ",usnchoice[0:-1],"!\nLoading.");time.sleep(0.5);clear()
                 print("Welcome ",usnchoice[0:-1],"!\nLoading..");time.sleep(0.5);clear()
                 print("Welcome ",usnchoice[0:-1],"!\nLoading...");time.sleep(0.5);clear()
-                return True
+                home()
             else:
                 n=n-1
                 if n!=0:
@@ -280,7 +294,9 @@ def login(): #Checks and logs in user
         clear()
         menu()
     else:
+        clear()
         print("This user doesn't exist!")
+        time.sleep(3)
         login()
 '''#def hotres():
     
@@ -298,7 +314,8 @@ def booking():#Shows available services
         clear()
         booking()'''
 def home():#Home page
-    homechoice=input("What would you like to do today?\n1)Make a Booking\n2)Booking History\n3)Vouchers\n4)Games\n5)Settings\n")
+    clear()
+    homechoice=input("What would you like to do today?\n1)Make a Booking\n2)Booking History\n3)Vouchers\n4)Games\n5)Settings\n6)Logout\n")
     if homechoice=='1':
         print("bookings page here")
     elif homechoice=='2':
@@ -306,13 +323,14 @@ def home():#Home page
     elif homechoice=='3':
         print("Voucher page here")
     elif homechoice=='4':
-        print("Games page here")
+        games()
     elif homechoice=='5':
         print("Settings page here")
+    elif homechoice=='6':
+        logout()
     else:
         print("Invalid Input")
         time.sleep(2)
-        clear()
         home()
 def menu():
     try: 
@@ -322,12 +340,7 @@ def menu():
     while True:
         loginno=input("Welcome to Bustle!\n1.Login\n2.Register\n")
         if loginno=='1':
-            bool=login()
-            if bool==True:
-                break
-            else:
-                time.sleep(3)
-                clear()
+            login()
         elif loginno=='2':
             register()
             time.sleep(3)
@@ -345,4 +358,3 @@ def menu():
             time.sleep(3)
             clear()
 menu()#Starts Execution here
-home()
