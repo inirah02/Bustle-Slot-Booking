@@ -3,6 +3,7 @@ import os #Using to clear screen using defined clear() function
 import time #Slow down execution using sleep()
 import stdiomask #used to accept password without showing characters
 clear = lambda: os.system('cls')
+user = ''
 def fileWrite(filename,data):#Universal function to write to any mentioned file
     with open(filename,'wb') as file:
         pickle.dump(data,file)
@@ -17,26 +18,31 @@ def logout():
     print("Logging out..");time.sleep(0.5);clear()
     print("Logging out...");time.sleep(0.5);clear()
     login()
+def setpass(usnID,score):
+    accounts=fileRead("UserAcc")
+    pass1=input("Enter a password:\n")
+    pass1=pass1.strip()
+    while True:
+        pass2=input("Confirm password:\n")
+        if pass2==pass1:
+            sq=input("Enter your Security Question:\n")
+            sa=input("Enter the answer for your Security Question:\nWARNING: Give and answer you can remember. You will need these in case you have to reset your account password!\n")
+            accounts.update({usnID:[pass1,score,sq,sa]})
+            fileWrite('UserAcc',accounts)
+            return 
+        else:
+            print("Oops password doesn't match! Try again:")
 def register(): #Adds new user account  
-    usn=input("Enter a username:\n")
+    usn=input("Enter a username:\n")    
     usn=usn.strip()
     usn=usn+'e'
     accounts=fileRead("UserAcc")
     if usn in accounts:
         print("Account already exists!")
     else:
-        pass1=input("Enter a password:\n")
-        pass1=pass1.strip()
-        while True:
-         pass2=input("Confirm password:\n")
-         pass2=pass2.strip()
-         if pass2==pass1:
-             accounts.update({usn:pass1})
-             fileWrite('UserAcc',accounts)
-             print('User account successfully created! You will now be redirected to the login page')
-             break
-         else:
-             print("Oops password doesn't match! Try again:")
+        setpass(usn,0)
+        input()
+        print('User account successfully created! You will now be redirected to the login page')
 def admin():
     adminpass=fileRead("UserAcc")
     adminpass=adminpass["admine"]
@@ -68,7 +74,7 @@ def admin():
                     service=fileRead(tempname)
             while True:
                 try:
-                    npname,npseat=input("Enter Name\Available Slots\n").split('\\')
+                    npname,npseat,npprice=input("Enter Name\Available Slots\Price per table\n").split('\\')
                 except:
                     print("Incorrect number of inputs received")
                     time.sleep(3)
@@ -78,7 +84,7 @@ def admin():
                     print("Entry already exists!")
                     time.sleep(3)
                 else:
-                    service.update({npname:npseat})
+                    service.update({npname:[npseat,npprice]})
                     break
             fileWrite(tempname,service)
             clear()
@@ -170,7 +176,7 @@ def admin():
                     admin()
                 elif ynchoice=='y':#check if really necessary
                     continue
-            '''if service:
+            '''if service:  
                 for key in service:
                     print(key)
             else:
@@ -236,6 +242,7 @@ def games():
         exec(open("").read())
     elif gchoice=='4':
         home()
+    home()
 def login(): #Checks and logs in user
     clear()
     n=5
@@ -260,7 +267,7 @@ def login(): #Checks and logs in user
             admin()
         else:
             if n!=0:
-                print("Incorrect Password. Try again!\nYou have ",n," tries remaining:")
+                print("Incorrect Password.\nTry again!\nYou have ",n," tries remaining:\n")
             else:
                 print("Too many failed attempts. You will now be redirected to the login page")
                 accounts[usnchoice[0:-1]+'d']=accounts[usnchoice]
@@ -270,17 +277,26 @@ def login(): #Checks and logs in user
     elif usnchoice in accounts and bool==True:
         while n>=0:
             loginpass=stdiomask.getpass("Enter your password\n")
-            if loginpass==accounts[usnchoice]:
+            if loginpass==accounts[usnchoice][0]:
                 clear()
+                global user 
                 print("Welcome ",usnchoice[0:-1],"!\nLoading");time.sleep(0.5);clear()
                 print("Welcome ",usnchoice[0:-1],"!\nLoading.");time.sleep(0.5);clear()
                 print("Welcome ",usnchoice[0:-1],"!\nLoading..");time.sleep(0.5);clear()
                 print("Welcome ",usnchoice[0:-1],"!\nLoading...");time.sleep(0.5);clear()
+                user = usnchoice[0:-1]
                 home()
+            elif loginpass=='F':
+                fpans=input(accounts[usnchoice][2])
+                if fpans== accounts[usnchoice][3]:
+                    print("Enter New Password(Make sure to remember this one!)\nNote:You will be required to enter new Security credentials\n")
+                    score=accounts[usnchoice][1]
+                    setpass(usnchoice,score)
+                    login()
             else:
-                n=n-1
+                n=n-1   
                 if n!=0:
-                    print("Incorrect Password. Try again!\nYou have ",n," tries remaining:")
+                    print("Incorrect Password.\nForgot Password? Press F (to pay respects)\nTry again!\nYou have ",n," tries remaining:")
                 else:
                     print("Too many failed attempts. You will now be redirected to the login page")
                     accounts[usnchoice[0:-1]+'d']=accounts[usnchoice]
@@ -298,26 +314,16 @@ def login(): #Checks and logs in user
         print("This user doesn't exist!")
         time.sleep(3)
         login()
-'''#def hotres():
-    
-def booking():#Shows available services
-    bookchoice=input("Choose a service:\n1)Hotel Bookings\n2)Restaurant Bookings\n3)Home Spa\n4)Bike Repair\n5)Tickets\n")
-    if bookchoice==1 or bookchoice==2:
-        hotres()     
-    elif bookchoice==3:
-       # print("Voucher page here")
-    elif bookchoice==4:
-        #print("Settings page here")
-    else:
-        print("Invalid Input")
-        time.sleep(2)
-        clear()
-        booking()'''
 def home():#Home page
     clear()
     homechoice=input("What would you like to do today?\n1)Make a Booking\n2)Booking History\n3)Vouchers\n4)Games\n5)Settings\n6)Logout\n")
     if homechoice=='1':
-        print("bookings page here")
+        clear()
+        print("Loading");time.sleep(0.5);clear()
+        print("Loading.");time.sleep(0.5);clear()
+        print("Loading..");time.sleep(0.5);clear()
+        print("Loading...");time.sleep(0.5);clear()
+        Booking()
     elif homechoice=='2':
         print("History page here")
     elif homechoice=='3':
@@ -357,4 +363,158 @@ def menu():
             print("Invalid Input")
             time.sleep(3)
             clear()
+def Booking(): #Bookings page
+    bchoice = input("Which service would you like to book?\n1.Restaurant\n2.Hotel\n3.Bus\n4.Cycle Repair\n5.Spa\n")
+    if bchoice == '1':
+        Restaurant()
+    else:
+        clear()
+        menu()
+def Restaurant(): #Choosing Restaurants
+    clear()
+    slots = fileRead("restaurant")
+    print("Which restaurant would you like to book a table in?")
+    for key in slots:
+        print(key)
+    print("(Press 'c' to go back)")
+    rchoice = input()
+    if rchoice in slots:
+        try:
+            fileRead(rchoice)
+        except:
+            fileWrite(rchoice, {"10:00-12:00":[slots[rchoice][0],slots[rchoice][1]],"12:00-2:00":[slots[rchoice][0],slots[rchoice][1]],"2:00-4:00":[slots[rchoice][0],slots[rchoice][1]],"4:00-6:00":[slots[rchoice][0],slots[rchoice][1]],"6:00-8:00":[slots[rchoice][0],slots[rchoice][1]],"8:00-10:00":[slots[rchoice][0],slots[rchoice][1]]})
+        booking = fileRead(rchoice)
+        print("\nNo. of seats per table: 4")
+        print(f"Price per table: {slots[rchoice][1]}")
+        while True:
+            print("\nWhich Time slot would you like to book?")
+            i = 1
+            for key in booking:
+                print(f"{i}) {key}")
+                i += 1
+            print("(Press 'c' to go back)")
+            tchoice = input()
+            if tchoice == '1':
+                tname = "10:00-12:00"
+            elif tchoice == '2':
+                tname = "12:00-2:00"
+            elif tchoice == '3':
+                tname = "2:00-4:00"
+            elif tchoice == '4':
+                tname = "4:00-6:00"
+            elif tchoice == '5':
+                tname = "6:00-8:00"
+            elif tchoice == '6':
+                tname = "8:00-10:00"
+            elif tchoice == 'c':
+                
+                clear()
+                Restaurant()
+            else:
+                print("Invalid Input!")
+                tname = ""
+            if tname in booking:
+                avail = int(booking[tname][0])
+                clear()
+                print(f"No. of seats available in time slot {tname}: {avail}")
+                nchoice = input("\nHow many persons would you like to book for?\n")
+                if nchoice.isdigit():   
+                    if (avail - int(nchoice)) > 0:
+                        if int(nchoice) > 4 and int(nchoice)%4 != 0:
+                            no = 1 + (int(nchoice)//4)
+                        elif int(nchoice)%4 == 0:
+                            no = int(nchoice)//4
+                        else:
+                            no = 1
+                        price = int(booking[tname][1])*no
+                        print("No. of tables:",no)
+                        print("Total price:",price)
+                        ychoice = input("Would you like to proceed to checkout(y/n)?\n")
+                        if ychoice == 'y':
+                            clear()
+                            print("Loading");time.sleep(0.5);clear()
+                            print("Loading.");time.sleep(0.5);clear()
+                            print("Loading..");time.sleep(0.5);clear()
+                            print("Loading...");time.sleep(0.5);clear()
+                            print("Restaurant name:",rchoice)
+                            print("Time slot:",tname)
+                            print("No of persons:",nchoice)
+                            print("Total price:",price)
+                            pchoice = input("\nDo you wish to continue?(y/n)\n")
+                            if pchoice == 'y':
+                                if checkout():
+                                    print("Payment successful")
+                                    avail = avail - no
+                                    booking.update({tname:[avail,booking[tname][1]]})
+                                    fileWrite(rchoice,booking)
+                                    time.sleep(3)
+                                    clear()
+                                    BookingHist(rchoice)
+                                    home()
+                                else:
+                                    print("Payment Failed!")
+                                    Restaurant()
+                            elif pchoice == 'n':
+                                clear()
+                            break
+                        elif ychoice == 'n':
+                            clear()
+                    else:
+                        print(f"\nSorry! {nchoice} number of seats unavailable in time slot {tname}")
+                        time.sleep(3)
+                        clear()
+                elif nchoice == 'c':
+                    clear()
+                else:
+                    print("invalid input!")
+                    time.sleep(3)
+                    clear()
+            else:
+                print("Invalid time slot!")
+                time.sleep(3)
+                clear()
+    elif rchoice == 'c':
+        clear()
+        Booking()
+    else:
+        print("Please give a valid restaurant name")
+        time.sleep(3)
+        clear()
+        Restaurant()
+def checkout(): #Checkout page
+    clear()
+    print("Loading");time.sleep(0.5);clear()
+    print("Loading.");time.sleep(0.5);clear()
+    print("Loading..");time.sleep(0.5);clear()
+    print("Loading...");time.sleep(0.5);clear()
+    pchoice = int(input("How would you like to make your payment?:\n1.Debit card\n2.Credit card\n"))
+    if pchoice == 1:
+        while True:
+            dcn = input("Enter Debit Card number:")
+            if len(dcn) == 16:
+                cvv = input("Enter cvv:")
+                return True
+            else:
+                print("Invalid Debit Card number!")
+                time.sleep(3)
+                clear()
+    elif pchoice == 2:
+        while True:
+            ccn = input("Enter Credit Card number:")
+            if len(ccn) == 16:
+                cvv = input("Enter cvv:")
+                return True
+            else:
+                print("Invalid Credit Card number!")
+                time.sleep(3)
+                clear()
+def BookingHist(a):
+    global user
+    try:
+        fileRead("bookings")
+    except:
+        fileWrite("bookings","")
+    hist = dict()
+    hist[user] = a
+    fileWrite("bookings",hist)
 menu()#Starts Execution here
